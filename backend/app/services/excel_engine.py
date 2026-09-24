@@ -113,19 +113,21 @@ def process_excel_import(file_bytes: bytes, db: Session, user_id: int, org_id: i
             if any("color" in v or "colour" in v or "product" in v or "size" in v for v in row_vals):
                 header_row_idx = r_idx
                 for c_idx, val in enumerate(row_vals, 1):
-                    if "cat" in val:
+                    if "total" in val or "profit" in val or "=" in val:
+                        continue # Skip summary/total columns
+                    if "cat" in val and "category" not in col_map:
                         col_map["category"] = c_idx
-                    elif "color" in val or "colour" in val or "product" in val or "item" in val:
+                    elif ("color" in val or "colour" in val or "product" in val or "item" in val) and "product" not in col_map:
                         col_map["product"] = c_idx
-                    elif "size" in val:
+                    elif "size" in val and "size" not in col_map:
                         col_map["size"] = c_idx
-                    elif "buy" in val or "buying" in val or "cost" in val or "price" in val and "sold" not in val and "selling" not in val:
+                    elif ("buying" in val or "buy" in val or "cost" in val or val == "price") and "buying_price" not in col_map:
                         col_map["buying_price"] = c_idx
-                    elif "sell" in val or "selling" in val or "sold price" in val:
+                    elif ("selling" in val or "sell" in val or "sold price" in val) and "selling_price" not in col_map:
                         col_map["selling_price"] = c_idx
-                    elif "date" in val:
+                    elif "date" in val and "date" not in col_map:
                         col_map["date"] = c_idx
-                    elif "qty" in val or "quantity" in val or "stock" in val:
+                    elif ("qty" in val or "quantity" in val or "stock" in val) and "qty" not in col_map:
                         col_map["qty"] = c_idx
                 break
                 
@@ -201,6 +203,12 @@ def process_excel_import(file_bytes: bytes, db: Session, user_id: int, org_id: i
                 db.add(variant)
                 db.flush()
                 summary["variants_created"] += 1
+            else:
+                # Update variant cost_price / selling_price if previously 0
+                if variant.cost_price == Decimal("0.00") and buying_val > Decimal("0.00"):
+                    variant.cost_price = buying_val
+                if variant.selling_price == Decimal("0.00") and selling_val > Decimal("0.00"):
+                    variant.selling_price = selling_val
 
             # Check if this row represents a SOLD item or UNSOLD stock item
             is_sold = False
@@ -212,7 +220,7 @@ def process_excel_import(file_bytes: bytes, db: Session, user_id: int, org_id: i
                 sale_datetime = date_val if isinstance(date_val, datetime) else datetime.now()
                 inv_num = f"INV-HIST-{int(datetime.now().timestamp())}-{summary['historical_sales_imported']+1}"
                 
-                cogs = buying_val
+                cogs = buying_val if buying_val > Decimal("0.00") else variant.cost_price
                 revenue = selling_val
                 profit = revenue - cogs
                 
