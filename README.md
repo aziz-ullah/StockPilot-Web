@@ -119,3 +119,23 @@ docker-compose up --build -d
 
 - Web App: `http://localhost:80`
 - API Backend: `http://localhost:8000`
+
+---
+
+## 🌐 Sharing Live Preview Link with Client (Without Cloud Deployment)
+
+To generate a instant, secure, public HTTPS link that your client can open on their phone or computer from anywhere:
+
+### Method 1: Python Tunnel Helper (Recommended)
+Run this command in the project folder:
+```bash
+python scripts/start_cloudflare_tunnel.py
+```
+It will print your live `https://<random-name>.trycloudflare.com` URL in the terminal.
+
+### Method 2: Direct Command Line
+Run this command in PowerShell or Command Prompt:
+```powershell
+C:\Users\User\cloudflared.exe tunnel --url http://localhost:3000
+```
+Look for `https://<random-name>.trycloudflare.com` in the terminal logs and send it to your client!
