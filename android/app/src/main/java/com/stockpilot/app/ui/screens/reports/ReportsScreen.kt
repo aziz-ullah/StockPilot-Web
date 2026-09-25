@@ -29,6 +29,10 @@ fun ReportsScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadReportData()
+    }
+
     LaunchedEffect(state.errorMessage, state.successMessage) {
         state.errorMessage?.let {
             snackbarHostState.showSnackbar(it)

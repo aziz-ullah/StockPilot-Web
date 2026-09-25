@@ -29,6 +29,10 @@ fun POSScreen(
     val state by viewModel.uiState.collectAsState()
     var showCheckoutBottomSheet by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadVariants()
+    }
+
     val subtotal = state.cart.sumOf { it.variant.sellingPrice * it.quantity }
     val grandTotal = (subtotal - state.discount + state.tax).coerceAtLeast(0.0)
 

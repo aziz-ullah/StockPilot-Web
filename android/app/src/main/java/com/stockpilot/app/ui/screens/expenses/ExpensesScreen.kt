@@ -31,6 +31,10 @@ fun ExpensesScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadExpenses()
+    }
+
     LaunchedEffect(state.errorMessage, state.successMessage) {
         state.errorMessage?.let {
             snackbarHostState.showSnackbar(it)

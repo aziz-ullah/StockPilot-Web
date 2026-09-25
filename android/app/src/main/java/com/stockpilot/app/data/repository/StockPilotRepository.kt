@@ -143,7 +143,7 @@ class StockPilotRepository(val tokenManager: TokenManager) {
     suspend fun getLowStockItems(): Result<List<LowStockItem>> =
         safeApiCall { api.getLowStockItems() }
 
-    // --- Excel Export ---
+    // --- Excel Export & Import ---
     suspend fun exportExcelStream(): Result<InputStream> {
         return try {
             val response = api.exportExcel()
@@ -152,6 +152,32 @@ class StockPilotRepository(val tokenManager: TokenManager) {
             } else {
                 Result.failure(Exception(parseErrorMessage(response.errorBody())))
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getExcelTemplateStream(): Result<InputStream> {
+        return try {
+            val response = api.getExcelTemplate()
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!.byteStream())
+            } else {
+                Result.failure(Exception(parseErrorMessage(response.errorBody())))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun importExcelFile(fileBytes: ByteArray, filename: String): Result<Map<String, Any>> {
+        return try {
+            val requestFile = okhttp3.RequestBody.create(
+                okhttp3.MediaType.parse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                fileBytes
+            )
+            val body = okhttp3.MultipartBody.Part.createFormData("file", filename, requestFile)
+            safeApiCall { api.importExcelFile(body) }
         } catch (e: Exception) {
             Result.failure(e)
         }

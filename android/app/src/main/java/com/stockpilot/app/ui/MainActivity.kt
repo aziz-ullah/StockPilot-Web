@@ -111,10 +111,11 @@ class MainActivity : ComponentActivity() {
                                         selected = currentRoute == screen.route,
                                         onClick = {
                                             scope.launch { drawerState.close() }
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
+                                            if (currentRoute != screen.route) {
+                                                navController.navigate(screen.route) {
+                                                    popUpTo(navController.graph.findStartDestination().id)
+                                                    launchSingleTop = true
+                                                }
                                             }
                                         },
                                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -155,10 +156,11 @@ class MainActivity : ComponentActivity() {
                                             label = { Text(screen.title) },
                                             selected = currentRoute == screen.route,
                                             onClick = {
-                                                navController.navigate(screen.route) {
-                                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                                    launchSingleTop = true
-                                                    restoreState = true
+                                                if (currentRoute != screen.route) {
+                                                    navController.navigate(screen.route) {
+                                                        popUpTo(navController.graph.findStartDestination().id)
+                                                        launchSingleTop = true
+                                                    }
                                                 }
                                             }
                                         )

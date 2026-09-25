@@ -24,17 +24,43 @@ import com.stockpilot.app.data.models.Product
 import com.stockpilot.app.data.models.Variant
 import com.stockpilot.app.ui.screens.dashboard.formatCurrency
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryScreen(
     viewModel: InventoryViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var showAddProductDialog by remember { mutableStateOf(false) }
     var selectedVariantForAdjust by remember { mutableStateOf<Variant?>(null) }
 
+    val excelPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                val inputStream = context.contentResolver.openInputStream(it)
+                val bytes = inputStream?.readBytes()
+                if (bytes != null) {
+                    viewModel.importExcelFile(bytes, "imported_inventory.xlsx")
+                }
+            } catch (e: Exception) {
+                // handle error
+            }
+        }
+    }
+
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
 
     LaunchedEffect(state.errorMessage, state.successMessage) {
         state.errorMessage?.let {
@@ -53,6 +79,9 @@ fun InventoryScreen(
             TopAppBar(
                 title = { Text("Inventory Management", fontWeight = FontWeight.Bold) },
                 actions = {
+                    IconButton(onClick = { excelPickerLauncher.launch("*/*") }) {
+                        Icon(Icons.Default.UploadFile, contentDescription = "Import Excel")
+                    }
                     IconButton(onClick = { showAddCategoryDialog = true }) {
                         Icon(Icons.Default.Category, contentDescription = "Add Category")
                     }

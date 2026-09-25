@@ -121,4 +121,13 @@ interface StockPilotApiService {
     @GET("reports/export/excel")
     @Streaming
     suspend fun exportExcel(): Response<ResponseBody>
+
+    // --- Excel Import & Template ---
+    @GET("excel/template")
+    @Streaming
+    suspend fun getExcelTemplate(): Response<ResponseBody>
+
+    @Multipart
+    @POST("excel/import")
+    suspend fun importExcelFile(@Part file: okhttp3.MultipartBody.Part): Response<Map<String, Any>>
 }

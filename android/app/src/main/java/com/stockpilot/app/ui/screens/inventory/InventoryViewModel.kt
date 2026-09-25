@@ -109,6 +109,25 @@ class InventoryViewModel(private val repository: StockPilotRepository) : ViewMod
         }
     }
 
+    fun importExcelFile(fileBytes: ByteArray, filename: String) {
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+        viewModelScope.launch {
+            val result = repository.importExcelFile(fileBytes, filename)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    successMessage = "Excel file '$filename' imported successfully!"
+                )
+                loadData()
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = result.exceptionOrNull()?.message ?: "Excel import failed"
+                )
+            }
+        }
+    }
+
     fun clearMessages() {
         _uiState.value = _uiState.value.copy(errorMessage = null, successMessage = null)
     }
