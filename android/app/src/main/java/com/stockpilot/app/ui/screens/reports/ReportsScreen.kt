@@ -123,7 +123,7 @@ fun ReportsScreen(
                         ) {
                             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 ReportSummaryLine(label = "Gross Sales Revenue", value = formatCurrency(kpis.totalSalesRevenue))
-                                ReportSummaryLine(label = "Cost of Goods Sold (COGS)", value = "-${formatCurrency(kpis.totalcogs)}")
+                                ReportSummaryLine(label = "Cost of Goods Sold (COGS)", value = "-${formatCurrency(kpis.totalCogs)}")
                                 HorizontalDivider()
                                 ReportSummaryLine(label = "Gross Profit Margin", value = formatCurrency(kpis.grossProfit), isBold = true, valueColor = Color(0xFF059669))
                                 ReportSummaryLine(label = "Total Operating Expenses", value = "-${formatCurrency(kpis.totalExpenses)}")

@@ -60,7 +60,8 @@ fun InventoryScreen(
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                 }
-            ),
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showAddProductDialog = true },
