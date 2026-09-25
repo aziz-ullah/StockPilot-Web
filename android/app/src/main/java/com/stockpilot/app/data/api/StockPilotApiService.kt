@@ -47,7 +47,7 @@ interface StockPilotApiService {
     @GET("products/{id}")
     suspend fun getProduct(@Path("id") id: Int): Response<Product>
 
-    @GET("products/variants/all")
+    @GET("products/variants")
     suspend fun getAllVariants(@Query("search") search: String? = null): Response<List<Variant>>
 
     @GET("products/variants/sku/{sku}")
@@ -108,10 +108,10 @@ interface StockPilotApiService {
     @GET("dashboard/kpis")
     suspend fun getDashboardKPIs(): Response<DashboardKPIs>
 
-    @GET("dashboard/sales-trend")
+    @GET("dashboard/charts/trends")
     suspend fun getSalesTrend(@Query("days") days: Int = 30): Response<List<TrendChartPoint>>
 
-    @GET("dashboard/category-sales")
+    @GET("dashboard/charts/categories")
     suspend fun getCategorySales(): Response<List<CategorySalesPoint>>
 
     @GET("dashboard/low-stock")
