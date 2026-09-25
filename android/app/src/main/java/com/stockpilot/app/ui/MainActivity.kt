@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.stockpilot.app.data.local.TokenManager
@@ -81,21 +80,9 @@ class MainActivity : ComponentActivity() {
                     navItems.add(Screen.Users)
                 }
 
-                if (currentRoute == "login" || currentRoute == null) {
-                    NavHost(navController = navController, startDestination = startDestination) {
-                        composable("login") {
-                            val loginViewModel = remember { LoginViewModel(repository) }
-                            LoginScreen(
-                                viewModel = loginViewModel,
-                                onLoginSuccess = {
-                                    navController.navigate(Screen.Dashboard.route) {
-                                        popUpTo("login") { inclusive = true }
-                                    }
-                                }
-                            )
-                        }
-                    }
-                } else {
+                val showTopAndBottomBars = currentRoute != null && currentRoute != "login"
+
+                if (showTopAndBottomBars) {
                     ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
@@ -179,54 +166,88 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(
+                            AppNavHost(
                                 navController = navController,
                                 startDestination = startDestination,
+                                repository = repository,
                                 modifier = Modifier.padding(innerPadding)
-                            ) {
-                                composable(Screen.Dashboard.route) {
-                                    val vm = remember { DashboardViewModel(repository) }
-                                    DashboardScreen(
-                                        viewModel = vm,
-                                        onNavigateToPOS = { navController.navigate(Screen.POS.route) },
-                                        onNavigateToInventory = { navController.navigate(Screen.Inventory.route) }
-                                    )
-                                }
-
-                                composable(Screen.Inventory.route) {
-                                    val vm = remember { InventoryViewModel(repository) }
-                                    InventoryScreen(viewModel = vm)
-                                }
-
-                                composable(Screen.POS.route) {
-                                    val vm = remember { POSViewModel(repository) }
-                                    POSScreen(viewModel = vm)
-                                }
-
-                                composable(Screen.Purchases.route) {
-                                    val vm = remember { PurchasesViewModel(repository) }
-                                    PurchasesScreen(viewModel = vm)
-                                }
-
-                                composable(Screen.Expenses.route) {
-                                    val vm = remember { ExpensesViewModel(repository) }
-                                    ExpensesScreen(viewModel = vm)
-                                }
-
-                                composable(Screen.Reports.route) {
-                                    val vm = remember { ReportsViewModel(repository) }
-                                    ReportsScreen(viewModel = vm)
-                                }
-
-                                composable(Screen.Users.route) {
-                                    val vm = remember { UsersViewModel(repository) }
-                                    UsersScreen(viewModel = vm)
-                                }
-                            }
+                            )
                         }
                     }
+                } else {
+                    AppNavHost(
+                        navController = navController,
+                        startDestination = startDestination,
+                        repository = repository,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AppNavHost(
+    navController: androidx.navigation.NavHostController,
+    startDestination: String,
+    repository: StockPilotRepository,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
+        composable("login") {
+            val loginViewModel = remember { LoginViewModel(repository) }
+            LoginScreen(
+                viewModel = loginViewModel,
+                onLoginSuccess = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.Dashboard.route) {
+            val vm = remember { DashboardViewModel(repository) }
+            DashboardScreen(
+                viewModel = vm,
+                onNavigateToPOS = { navController.navigate(Screen.POS.route) },
+                onNavigateToInventory = { navController.navigate(Screen.Inventory.route) }
+            )
+        }
+
+        composable(Screen.Inventory.route) {
+            val vm = remember { InventoryViewModel(repository) }
+            InventoryScreen(viewModel = vm)
+        }
+
+        composable(Screen.POS.route) {
+            val vm = remember { POSViewModel(repository) }
+            POSScreen(viewModel = vm)
+        }
+
+        composable(Screen.Purchases.route) {
+            val vm = remember { PurchasesViewModel(repository) }
+            PurchasesScreen(viewModel = vm)
+        }
+
+        composable(Screen.Expenses.route) {
+            val vm = remember { ExpensesViewModel(repository) }
+            ExpensesScreen(viewModel = vm)
+        }
+
+        composable(Screen.Reports.route) {
+            val vm = remember { ReportsViewModel(repository) }
+            ReportsScreen(viewModel = vm)
+        }
+
+        composable(Screen.Users.route) {
+            val vm = remember { UsersViewModel(repository) }
+            UsersScreen(viewModel = vm)
         }
     }
 }
