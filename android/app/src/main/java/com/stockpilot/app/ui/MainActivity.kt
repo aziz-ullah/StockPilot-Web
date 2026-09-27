@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import java.util.Locale
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.stockpilot.app.data.local.TokenManager
@@ -86,29 +88,84 @@ class MainActivity : ComponentActivity() {
                     ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
-                            ModalDrawerSheet {
-                                Spacer(modifier = Modifier.height(24.dp))
-                                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                                    Text(
-                                        text = "StockPilot Mobile",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = "Logged in as: ${tokenManager.getUserName() ?: "User"} (${tokenManager.getUserRole() ?: "Staff"})",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                    )
+                            ModalDrawerSheet(
+                                drawerContainerColor = androidx.compose.ui.graphics.Color(0xFF1E222D),
+                                drawerContentColor = androidx.compose.ui.graphics.Color.White
+                            ) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                // Top Header Row matching reference design (Avatar + Name + MoreVert)
+                                Row(
+                                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                                ) {
+                                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                        Surface(
+                                            shape = androidx.compose.foundation.shape.CircleShape,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(38.dp)
+                                        ) {
+                                            Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
+                                                Text(
+                                                    text = (tokenManager.getUserName() ?: "U").take(1).uppercase(Locale.getDefault()),
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = androidx.compose.ui.graphics.Color.White,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column {
+                                            Text(
+                                                text = tokenManager.getUserName() ?: "User",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp,
+                                                color = androidx.compose.ui.graphics.Color.White
+                                            )
+                                            Text(
+                                                text = tokenManager.getUserRole() ?: "Staff",
+                                                fontSize = 12.sp,
+                                                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
+                                            )
+                                        }
+                                    }
+                                    IconButton(onClick = { }) {
+                                        Icon(
+                                            imageVector = Icons.Default.MoreVert,
+                                            contentDescription = "Options",
+                                            tint = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f)
+                                        )
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(24.dp))
-                                HorizontalDivider()
+
+                                Spacer(modifier = Modifier.height(8.dp))
+                                HorizontalDivider(color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.12f))
+                                Spacer(modifier = Modifier.height(12.dp))
 
                                 navItems.forEach { screen ->
+                                    val isSelected = currentRoute == screen.route
                                     NavigationDrawerItem(
-                                        icon = { Icon(screen.icon, contentDescription = null) },
-                                        label = { Text(screen.title) },
-                                        selected = currentRoute == screen.route,
+                                        icon = {
+                                            Icon(
+                                                screen.icon,
+                                                contentDescription = null,
+                                                tint = if (isSelected) androidx.compose.ui.graphics.Color(0xFF00E5FF) else androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f)
+                                            )
+                                        },
+                                        label = {
+                                            Text(
+                                                screen.title,
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                color = if (isSelected) androidx.compose.ui.graphics.Color.White else androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f)
+                                            )
+                                        },
+                                        selected = isSelected,
+                                        colors = NavigationDrawerItemDefaults.colors(
+                                            selectedContainerColor = androidx.compose.ui.graphics.Color(0xFF00E5FF).copy(alpha = 0.2f),
+                                            unselectedContainerColor = androidx.compose.ui.graphics.Color.Transparent
+                                        ),
                                         onClick = {
                                             scope.launch { drawerState.close() }
                                             if (currentRoute != screen.route) {
@@ -118,15 +175,15 @@ class MainActivity : ComponentActivity() {
                                                 }
                                             }
                                         },
-                                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
                                     )
                                 }
 
                                 Spacer(modifier = Modifier.weight(1f))
-                                HorizontalDivider()
+                                HorizontalDivider(color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.12f))
                                 NavigationDrawerItem(
-                                    icon = { Icon(Icons.Default.Logout, contentDescription = null) },
-                                    label = { Text("Sign Out") },
+                                    icon = { Icon(Icons.Default.Logout, contentDescription = null, tint = androidx.compose.ui.graphics.Color(0xFFFF5252)) },
+                                    label = { Text("Sign Out", color = androidx.compose.ui.graphics.Color(0xFFFF5252)) },
                                     selected = false,
                                     onClick = {
                                         scope.launch { drawerState.close() }
@@ -135,7 +192,7 @@ class MainActivity : ComponentActivity() {
                                             popUpTo(0) { inclusive = true }
                                         }
                                     },
-                                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
@@ -172,6 +229,7 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 startDestination = startDestination,
                                 repository = repository,
+                                onOpenDrawer = { scope.launch { drawerState.open() } },
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
@@ -194,6 +252,7 @@ fun AppNavHost(
     navController: androidx.navigation.NavHostController,
     startDestination: String,
     repository: StockPilotRepository,
+    onOpenDrawer: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -218,38 +277,39 @@ fun AppNavHost(
             DashboardScreen(
                 viewModel = vm,
                 onNavigateToPOS = { navController.navigate(Screen.POS.route) },
-                onNavigateToInventory = { navController.navigate(Screen.Inventory.route) }
+                onNavigateToInventory = { navController.navigate(Screen.Inventory.route) },
+                onOpenDrawer = onOpenDrawer
             )
         }
 
         composable(Screen.Inventory.route) {
             val vm = remember { InventoryViewModel(repository) }
-            InventoryScreen(viewModel = vm)
+            InventoryScreen(viewModel = vm, onOpenDrawer = onOpenDrawer)
         }
 
         composable(Screen.POS.route) {
             val vm = remember { POSViewModel(repository) }
-            POSScreen(viewModel = vm)
+            POSScreen(viewModel = vm, onOpenDrawer = onOpenDrawer)
         }
 
         composable(Screen.Purchases.route) {
             val vm = remember { PurchasesViewModel(repository) }
-            PurchasesScreen(viewModel = vm)
+            PurchasesScreen(viewModel = vm, onOpenDrawer = onOpenDrawer)
         }
 
         composable(Screen.Expenses.route) {
             val vm = remember { ExpensesViewModel(repository) }
-            ExpensesScreen(viewModel = vm)
+            ExpensesScreen(viewModel = vm, onOpenDrawer = onOpenDrawer)
         }
 
         composable(Screen.Reports.route) {
             val vm = remember { ReportsViewModel(repository) }
-            ReportsScreen(viewModel = vm)
+            ReportsScreen(viewModel = vm, onOpenDrawer = onOpenDrawer)
         }
 
         composable(Screen.Users.route) {
             val vm = remember { UsersViewModel(repository) }
-            UsersScreen(viewModel = vm)
+            UsersScreen(viewModel = vm, onOpenDrawer = onOpenDrawer)
         }
     }
 }

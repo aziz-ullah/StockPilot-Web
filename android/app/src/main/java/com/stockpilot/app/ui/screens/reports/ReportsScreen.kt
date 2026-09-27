@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TableChart
@@ -23,7 +24,8 @@ import com.stockpilot.app.ui.screens.dashboard.formatCurrency
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsScreen(
-    viewModel: ReportsViewModel
+    viewModel: ReportsViewModel,
+    onOpenDrawer: (() -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -47,11 +49,12 @@ fun ReportsScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("Reports & Analytics", fontWeight = FontWeight.Bold) },
+            com.stockpilot.app.ui.components.CompactTopHeader(
+                title = "Reports",
+                onOpenDrawer = onOpenDrawer,
                 actions = {
                     IconButton(onClick = { viewModel.loadReportData() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(20.dp))
                     }
                 }
             )

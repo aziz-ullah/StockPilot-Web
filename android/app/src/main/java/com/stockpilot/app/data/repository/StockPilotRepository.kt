@@ -5,6 +5,8 @@ import com.stockpilot.app.data.api.NetworkClient
 import com.stockpilot.app.data.api.StockPilotApiService
 import com.stockpilot.app.data.local.TokenManager
 import com.stockpilot.app.data.models.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import java.io.InputStream
@@ -172,10 +174,8 @@ class StockPilotRepository(val tokenManager: TokenManager) {
 
     suspend fun importExcelFile(fileBytes: ByteArray, filename: String): Result<Map<String, Any>> {
         return try {
-            val requestFile = okhttp3.RequestBody.create(
-                okhttp3.MediaType.parse("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-                fileBytes
-            )
+            val mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".toMediaTypeOrNull()
+            val requestFile = fileBytes.toRequestBody(mediaType)
             val body = okhttp3.MultipartBody.Part.createFormData("file", filename, requestFile)
             safeApiCall { api.importExcelFile(body) }
         } catch (e: Exception) {

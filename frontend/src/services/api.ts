@@ -5,7 +5,20 @@ import {
   CategorySalesPoint, LowStockItem, ImportSummary
 } from '../types';
 
-const API_BASE = '/api/v1';
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (!envUrl) return '/api/v1';
+  let url = envUrl.trim();
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`;
+  }
+  return url;
+};
+
+const API_BASE = getApiBase();
 
 export const api = axios.create({
   baseURL: API_BASE,

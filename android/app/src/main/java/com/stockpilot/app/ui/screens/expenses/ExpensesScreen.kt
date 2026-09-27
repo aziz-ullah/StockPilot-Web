@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +25,8 @@ import com.stockpilot.app.ui.screens.dashboard.formatCurrency
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
-    viewModel: ExpensesViewModel
+    viewModel: ExpensesViewModel,
+    onOpenDrawer: (() -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsState()
     var showAddExpenseDialog by remember { mutableStateOf(false) }
@@ -49,11 +51,12 @@ fun ExpensesScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("Operational Expenses", fontWeight = FontWeight.Bold) },
+            com.stockpilot.app.ui.components.CompactTopHeader(
+                title = "Expenses",
+                onOpenDrawer = onOpenDrawer,
                 actions = {
                     IconButton(onClick = { viewModel.loadExpenses() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(20.dp))
                     }
                 }
             )

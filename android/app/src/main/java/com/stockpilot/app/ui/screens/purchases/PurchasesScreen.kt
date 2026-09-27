@@ -25,7 +25,8 @@ import com.stockpilot.app.ui.screens.dashboard.formatCurrency
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PurchasesScreen(
-    viewModel: PurchasesViewModel
+    viewModel: PurchasesViewModel,
+    onOpenDrawer: (() -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsState()
     var showAddSupplierDialog by remember { mutableStateOf(false) }
@@ -51,14 +52,15 @@ fun PurchasesScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("Stock Purchases (Inward)", fontWeight = FontWeight.Bold) },
+            com.stockpilot.app.ui.components.CompactTopHeader(
+                title = "Purchases",
+                onOpenDrawer = onOpenDrawer,
                 actions = {
                     IconButton(onClick = { showAddSupplierDialog = true }) {
-                        Icon(Icons.Default.PersonAdd, contentDescription = "Add Supplier")
+                        Icon(Icons.Default.PersonAdd, contentDescription = "Add Supplier", modifier = Modifier.size(20.dp))
                     }
                     IconButton(onClick = { viewModel.loadData() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(20.dp))
                     }
                 }
             )

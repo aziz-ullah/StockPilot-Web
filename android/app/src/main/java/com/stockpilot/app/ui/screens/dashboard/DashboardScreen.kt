@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,7 +27,8 @@ import java.util.Locale
 fun DashboardScreen(
     viewModel: DashboardViewModel,
     onNavigateToPOS: () -> Unit,
-    onNavigateToInventory: () -> Unit
+    onNavigateToInventory: () -> Unit,
+    onOpenDrawer: (() -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -36,11 +38,12 @@ fun DashboardScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Executive Dashboard", fontWeight = FontWeight.Bold) },
+            com.stockpilot.app.ui.components.CompactTopHeader(
+                title = "Dashboard",
+                onOpenDrawer = onOpenDrawer,
                 actions = {
                     IconButton(onClick = { viewModel.loadDashboardData() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(20.dp))
                     }
                 }
             )

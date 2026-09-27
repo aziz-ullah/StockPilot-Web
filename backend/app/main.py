@@ -1,5 +1,7 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from app.core.config import settings
 from app.core.database import engine, Base, SessionLocal
 from app.core.security import get_password_hash
@@ -15,9 +17,12 @@ app = FastAPI(
 )
 
 # CORS Middleware configuration
+raw_origins = os.getenv("ALLOWED_ORIGINS", "*")
+origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins if origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,4 +92,20 @@ def root():
         "message": f"Welcome to {settings.PROJECT_NAME} API",
         "version": settings.VERSION,
         "docs": "/docs"
+    }
+
+@app.get("/health")
+def health_check():
+    db_status = "healthy"
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+
+    return {
+        "status": "ok" if db_status == "healthy" else "degraded",
+        "database": db_status,
+        "version": settings.VERSION
     }

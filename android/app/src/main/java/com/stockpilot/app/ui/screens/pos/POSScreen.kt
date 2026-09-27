@@ -24,7 +24,8 @@ import com.stockpilot.app.ui.screens.dashboard.formatCurrency
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun POSScreen(
-    viewModel: POSViewModel
+    viewModel: POSViewModel,
+    onOpenDrawer: (() -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsState()
     var showCheckoutBottomSheet by remember { mutableStateOf(false) }
@@ -38,12 +39,13 @@ fun POSScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("POS Terminal Checkout", fontWeight = FontWeight.Bold) },
+            com.stockpilot.app.ui.components.CompactTopHeader(
+                title = "POS Sale",
+                onOpenDrawer = onOpenDrawer,
                 actions = {
                     if (state.cart.isNotEmpty()) {
                         TextButton(onClick = { viewModel.clearCart() }) {
-                            Text("Clear Cart", color = MaterialTheme.colorScheme.error)
+                            Text("Clear Cart", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
                         }
                     }
                 }

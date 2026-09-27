@@ -32,7 +32,8 @@ import androidx.compose.ui.platform.LocalContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryScreen(
-    viewModel: InventoryViewModel
+    viewModel: InventoryViewModel,
+    onOpenDrawer: (() -> Unit)? = null
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -76,17 +77,18 @@ fun InventoryScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = { Text("Inventory Management", fontWeight = FontWeight.Bold) },
+            com.stockpilot.app.ui.components.CompactTopHeader(
+                title = "Inventory",
+                onOpenDrawer = onOpenDrawer,
                 actions = {
                     IconButton(onClick = { excelPickerLauncher.launch("*/*") }) {
-                        Icon(Icons.Default.UploadFile, contentDescription = "Import Excel")
+                        Icon(Icons.Default.UploadFile, contentDescription = "Import Excel", modifier = Modifier.size(20.dp))
                     }
                     IconButton(onClick = { showAddCategoryDialog = true }) {
-                        Icon(Icons.Default.Category, contentDescription = "Add Category")
+                        Icon(Icons.Default.Category, contentDescription = "Add Category", modifier = Modifier.size(20.dp))
                     }
                     IconButton(onClick = { viewModel.loadData() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", modifier = Modifier.size(20.dp))
                     }
                 }
             )
